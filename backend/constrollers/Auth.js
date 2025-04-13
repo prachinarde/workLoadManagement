@@ -2,9 +2,10 @@ const prisma = require("./config/schema.prisma");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+
 exports.signup = async (req, res) => {
     try{
-          const role = req.params
+          const role = req.params;
           if(role=="staff"){
             const {
                 email,
@@ -58,8 +59,7 @@ exports.signup = async (req, res) => {
                     password,
                     name,
                     phone,
-                    addresses,
-                    orders
+                    addresses
                 } = req.body;
 
                 

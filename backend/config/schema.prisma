@@ -42,23 +42,11 @@ model User {
   password    String
   name        String
   phone       String
-  addresses   Address[]
   orders      Order[] 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
 
-model Address {
-  id          String    @id @default(uuid())
-  street      String
-  city        String
-  state       String
-  zipCode     String
-  isDefault   Boolean   @default(false)
-  userId      String
-  user        User      @relation(fields: [userId], references: [id])
-  orders      Order[]
-}
 
 model Staff {
   id          String    @id @default(uuid())
@@ -67,7 +55,7 @@ model Staff {
   name        String
   phone       String
   role        String    // "chef", "manager", "delivery", etc.
-  skill       String[]
+  skills       String[]
   station     Station[]  @relation(fields: [stationId], references: [id])
   createdAt   DateTime  @default(now())
 }
@@ -99,6 +87,7 @@ model OrderItem {
   pizza       Pizza     @relation(fields: [pizzaId], references: [id])
   pizzaId     String
   quantity    Int       @default(1)
+  group       String
   specialInstructions String?
 }
 

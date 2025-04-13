@@ -5,11 +5,11 @@ exports.createOrder = async (req, res) =>{
         const userId = req.user.id;
       
     
+
         let {
           address,
           order_description,
           items,
-          status,
           totalPrice
 
          
@@ -29,7 +29,6 @@ exports.createOrder = async (req, res) =>{
             address,
             order_description,
             items,
-            status,
             totalPrice  
         });
     
@@ -57,3 +56,39 @@ exports.createOrder = async (req, res) =>{
         });
       }
 };
+
+exports.updateOrderStatus = async (req, res) => {
+  try {
+    const { orderId } = req.body;
+    const curr_status = req.body;
+    const order = await prisma.Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({ error: "order not found" });
+    }
+
+
+  
+          order[status] = curr_status;
+     
+
+    await order.save();
+
+    const updatedOrder = await Course.findOne({_id: orderId})
+ 
+
+    res.json({
+      success: true,
+      message: "Order updated successfully",
+      data: updatedOrder,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
