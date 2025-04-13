@@ -1,0 +1,122 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://neondb_owner:npg_tv6n7TLGdhor@ep-little-salad-a57chtkt-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require"
+}
+
+enum OrderStatus {
+  RECEIVED
+  PREPARING
+  BAKING
+  QUALITY_CHECK
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+}
+
+enum PizzaSize {
+  SMALL
+  MEDIUM
+  LARGE
+  EXTRA_LARGE
+}
+
+enum ToppingType {
+  VEGETABLE
+  MEAT
+  CHEESE
+  SAUCE
+  SPECIALTY
+}
+
+model User {
+  id          String    @id @default(uuid())
+  email       String    @unique
+  password    String
+  name        String
+  phone       String
+  addresses   Address[]
+  orders      Order[] 
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Address {
+  id          String    @id @default(uuid())
+  street      String
+  city        String
+  state       String
+  zipCode     String
+  isDefault   Boolean   @default(false)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  orders      Order[]
+}
+
+model Staff {
+  id          String    @id @default(uuid())
+  email       String    @unique
+  password    String
+  name        String
+  phone       String
+  role        String    // "chef", "manager", "delivery", etc.
+  skill       String[]
+  station     Station[]  @relation(fields: [stationId], references: [id])
+  createdAt   DateTime  @default(now())
+}
+
+model Station {
+  id          String    @id @default(uuid())
+  name        String    // "Dough Prep", "Topping", "Oven", "Quality Control", "Packaging"
+  staff       Staff[]
+  currentOrders Order[]
+}
+
+model Order {
+  id          String      @id @default(uuid())
+  orderNumber String      @unique
+  address     string
+  order_description: string
+  items       OrderItem[] @relation(fields: [orderId], references: [id])
+  status      OrderStatus @default(RECEIVED)
+  totalPrice  Float
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+}
+
+model OrderItem {
+  id          String    @id @default(uuid())
+  order       Order     @relation(fields: [orderId], references: [id])
+  orderId     String
+  pizza       Pizza     @relation(fields: [pizzaId], references: [id])
+  pizzaId     String
+  quantity    Int       @default(1)
+  specialInstructions String?
+}
+
+model Pizza {
+  id          String    @id @default(uuid())
+  name        String
+  description String
+  basePrice   Float
+  size        PizzaSize
+  crustType   String    // "Hand Tossed", "Thin Crust", "Pan", etc.
+  toppings    Topping[]
+}
+
+model Topping {
+  id          String    @id @default(uuid())
+  name        String
+  type        ToppingType
+  price       Float
+  isVegetarian Boolean
+  pizzas      Pizza[]
+}
